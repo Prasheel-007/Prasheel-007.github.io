@@ -29,25 +29,22 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1; /* Behind content */
+    z-index: -1; 
     
-    /* 1. THE TEXTURE: A rich, dark cyber-gradient + Neon Grid */
+    /* 1. THE TEXTURE */
     background: 
-        /* The Neon Grid Lines (Cyan) */
         linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px),
-        /* The "Plasma" Glow (Deep Blue/Purple atmosphere) */
         radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(20, 30, 60, 1) 0%, #000000 100%);
         
     background-size: 40px 40px, 40px 40px, 100% 100%;
     
-    /* 2. THE REVEAL MASK (The Flashlight) */
-    /* We make this HUGE (800px) so it feels like an atmosphere, not a spot */
+    /* 2. THE REVEAL MASK */
     mask-image: radial-gradient(
         circle at var(--mouse-x) var(--mouse-y), 
-        black 0%,       /* Full visibility at center */
-        rgba(0,0,0,0.5) 30%, /* Semi-visible mid-range */
-        transparent 70% /* Fade to total black at edges */
+        black 0%, 
+        rgba(0,0,0,0.5) 30%, 
+        transparent 70% 
     );
     -webkit-mask-image: radial-gradient(
         circle at var(--mouse-x) var(--mouse-y), 
@@ -84,7 +81,7 @@ body {
     transition: width 0.2s, height 0.2s, background-color 0.2s; 
 }
 
-/* --- NAVIGATION --- */
+/* --- NAVIGATION (UPDATED) --- */
 nav {
     display: flex;
     justify-content: space-between;
@@ -93,25 +90,50 @@ nav {
     position: fixed;
     width: 100%;
     top: 0;
-    /* Subtle glass, mostly transparent to let the light show through */
     background: rgba(0, 0, 0, 0.5); 
     backdrop-filter: blur(5px);
     z-index: 1000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* --- LOGO UPGRADE (Holographic Style) --- */
 .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--accent-color);
+    font-size: 2rem; /* Increased size */
+    font-weight: 800; /* Extra Bold */
     text-decoration: none;
-    letter-spacing: 1px;
     text-transform: uppercase;
+    letter-spacing: 2px;
+    
+    /* Gradient Text Fill */
+    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* Neon Aura */
+    filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
+    transition: filter 0.3s;
 }
 
+.logo:hover {
+    filter: drop-shadow(0 0 15px rgba(112, 0, 255, 0.8)); /* Glows Purple on hover */
+}
+
+/* --- NAV LINKS UPGRADE (Larger Size) --- */
 .nav-links { list-style: none; display: flex; gap: 30px; }
-.nav-links a { color: var(--text-color); text-decoration: none; font-weight: 500; font-size: 0.9rem; display: inline-block; transition: color 0.3s; }
-.nav-links a:hover { color: var(--accent-color); }
+
+.nav-links a { 
+    color: var(--text-color); 
+    text-decoration: none; 
+    font-weight: 500; 
+    font-size: 1.1rem; /* Increased from 0.9rem */
+    display: inline-block; 
+    transition: color 0.3s, text-shadow 0.3s; 
+}
+
+.nav-links a:hover { 
+    color: var(--accent-color); 
+    text-shadow: 0 0 10px var(--accent-color); /* Added Glow */
+}
 
 /* --- HERO SECTION --- */
 .hero {
@@ -122,7 +144,6 @@ nav {
     align-items: center;
     text-align: center;
     padding: 0 20px;
-    /* NO BACKGROUND HERE - We want the grid to shine through */
 }
 
 .hero h1 {
@@ -135,19 +156,47 @@ nav {
     z-index: 2;
 }
 
-/* --- GLITCH & GRAVITY --- */
-.highlight { color: var(--accent-color); position: relative; font-weight: bold; display: inline-block; transition: opacity 0.2s; }
-.highlight::before, .highlight::after { content: attr(data-text); position: absolute; top: 0; width: 100%; height: 100%; background: var(--bg-color); opacity: 0; transition: opacity 0.1s; }
-.highlight::before { left: 4px; text-shadow: -2px 0 #ff00c1; clip: rect(44px, 450px, 56px, 0); }
-.highlight::after { left: -4px; text-shadow: -2px 0 #00fff9; clip: rect(44px, 450px, 56px, 0); }
+/* --- AGGRESSIVE GLITCH ENGINE --- */
+.highlight { 
+    color: var(--accent-color); 
+    position: relative; 
+    font-weight: bold; 
+    display: inline-block; 
+    transition: opacity 0.2s; 
+}
 
-/* Activation States */
+.highlight::before, .highlight::after { 
+    content: attr(data-text); 
+    position: absolute; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: var(--bg-color); 
+    opacity: 0; 
+    transition: opacity 0.1s;
+}
+
+.highlight::before { 
+    left: 4px; 
+    text-shadow: -2px 0 #ff00c1; 
+    clip: rect(44px, 450px, 56px, 0); 
+}
+
+.highlight::after { 
+    left: -4px; 
+    text-shadow: -2px 0 #00fff9; 
+    clip: rect(44px, 450px, 56px, 0); 
+}
+
+/* STATES */
 .highlight.tremble::before { opacity: 0.7; animation: glitch-anim 0.3s infinite linear alternate-reverse; }
 .highlight.tremble::after { opacity: 0.7; animation: glitch-anim2 0.3s infinite linear alternate-reverse; }
 .highlight.glitch-active::before { opacity: 1; animation: glitch-anim 0.05s infinite linear alternate-reverse; }
 .highlight.glitch-active::after { opacity: 1; animation: glitch-anim2 0.05s infinite linear alternate-reverse; }
+
 .magnet-active { text-shadow: 0 0 20px var(--accent-color); }
 
+/* KEYFRAMES */
 @keyframes glitch-anim {
     0% { clip: rect(10px, 9999px, 30px, 0); transform: skew(0.5deg); }
     20% { clip: rect(80px, 9999px, 100px, 0); transform: skew(-0.5deg); }
@@ -193,11 +242,11 @@ nav {
 .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
 
 .project-card {
-    background: rgba(22, 27, 34, 0.6); /* Transparent Glass */
-    backdrop-filter: blur(10px); /* Heavy Blur */
+    background: rgba(22, 27, 34, 0.6); 
+    backdrop-filter: blur(10px); 
     border-radius: 15px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05); /* Very subtle border */
+    border: 1px solid rgba(255, 255, 255, 0.05); 
     transition: box-shadow 0.3s, border-color 0.3s, opacity 0.8s;
     animation: assemble 0.8s ease-out forwards;
     opacity: 0; transform: translateY(50px) scale(0.9); will-change: transform;
