@@ -8,97 +8,118 @@ cursorOutline.className = "cursor-outline";
 document.body.appendChild(cursorDot);
 document.body.appendChild(cursorOutline);
 
-// Select the "Magic" and "Logic" text elements
+// Select Targets
 const glitchTargets = document.querySelectorAll('.highlight');
-const magnets = document.querySelectorAll('.highlight, .cta-btn, .nav-links a');
+const gravityFields = document.querySelectorAll('.highlight, .cta-btn, .nav-links a, .project-card, h1');
 
 // Global Mouse Position
 let mouseX = 0;
 let mouseY = 0;
 
-/* --- MOUSE TRACKING --- */
-window.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
+// Outline coordinates (for the "drag" physics)
+let outlineX = 0;
+let outlineY = 0;
 
+/* --- PHYSICS LOOP --- */
+function animate() {
     // 1. Cursor Dot follows instantly
     cursorDot.style.left = `${mouseX}px`;
     cursorDot.style.top = `${mouseY}px`;
 
-    // 2. Cursor Outline follows with lag (Smooth physics)
-    cursorOutline.animate({
-        left: `${mouseX}px`,
-        top: `${mouseY}px`
-    }, { duration: 500, fill: "forwards" });
+    // 2. Cursor Outline follows with "Mass"
+    outlineX += (mouseX - outlineX) * 0.12;
+    outlineY += (mouseY - outlineY) * 0.12;
 
-    // 3. RUN PROXIMITY CHECKS
+    cursorOutline.style.left = `${outlineX}px`;
+    cursorOutline.style.top = `${outlineY}px`;
+
+    // 3. BACKGROUND LIGHT UPDATE
+    // This connects JS to CSS Variables. 
+    // It creates the "Heavy Light" effect on the background grid.
+    document.documentElement.style.setProperty('--mouse-x', `${outlineX}px`);
+    document.documentElement.style.setProperty('--mouse-y', `${outlineY}px`);
+
+    // 4. Run Physics Engines
+    handleGravity();
     checkProximity();
-    handleMagnetism(e);
+
+    requestAnimationFrame(animate);
+}
+
+// Start the System
+animate();
+
+/* --- INPUT LISTENER --- */
+window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 });
 
-/* --- FEATURE 1: PROXIMITY GLITCH --- */
+/* --- GRAVITY ENGINE (Enhanced Range) --- */
+function handleGravity() {
+    let isInOrbit = false;
+
+    gravityFields.forEach(field => {
+        const rect = field.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
+        const orbitRadius = 600; // Wide Range
+        const coreRadius = 80;   // Event Horizon
+        
+        if (dist < orbitRadius) {
+            isInOrbit = true;
+            const rawPull = 1 - (dist / orbitRadius);
+            const gravityStrength = Math.pow(rawPull, 2); 
+
+            const moveX = (mouseX - centerX) * gravityStrength * 0.6; 
+            const moveY = (mouseY - centerY) * gravityStrength * 0.6;
+
+            field.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            
+            const size = 40 + (40 * gravityStrength); 
+            cursorOutline.style.width = `${size}px`;
+            cursorOutline.style.height = `${size}px`;
+            
+            if (dist < coreRadius) {
+                cursorOutline.style.borderColor = 'var(--secondary-color)'; 
+                cursorOutline.style.mixBlendMode = 'difference';
+                cursorOutline.style.opacity = 1;
+            } else {
+                cursorOutline.style.borderColor = 'var(--accent-color)'; 
+                cursorOutline.style.opacity = 0.5 + (gravityStrength * 0.5); 
+            }
+        } else {
+            field.style.transform = `translate(0px, 0px)`;
+        }
+    });
+
+    if (!isInOrbit) {
+        cursorOutline.style.width = '40px';
+        cursorOutline.style.height = '40px';
+        cursorOutline.style.borderColor = 'var(--accent-color)';
+        cursorOutline.style.opacity = 0.5;
+        cursorOutline.style.mixBlendMode = 'normal';
+    }
+}
+
+/* --- GLITCH TRIGGER --- */
 function checkProximity() {
     glitchTargets.forEach(target => {
-        // Get the center of the text
         const rect = target.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
+        const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
 
-        // Calculate distance using Pythagoras theorem
-        const distance = Math.hypot(mouseX - centerX, mouseY - centerY);
-
-        // RESET STATES
         target.classList.remove('glitch-active');
         target.classList.remove('tremble');
 
-        // LOGIC: Distance Thresholds
-        if (distance < 50) {
-            // Very Close: FULL CHAOS
-            target.classList.add('glitch-active');
-        } else if (distance < 150) {
-            // Nearby: MILD TREMBLE
-            target.classList.add('tremble');
+        if (dist < 80) {
+            target.classList.add('glitch-active'); 
+        } else if (dist < 300) {
+            target.classList.add('tremble'); 
         }
     });
 }
-
-/* --- FEATURE 2: MAGNETIC PULL --- */
-function handleMagnetism(e) {
-    magnets.forEach(magnet => {
-        const rect = magnet.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        // Calculate distance
-        const distance = Math.hypot(mouseX - centerX, mouseY - centerY);
-        
-        // If within "Magnetic Field" (100px radius)
-        if (distance < 100) {
-            magnet.classList.add('magnet-active');
-            
-            // Calculate pull strength (closer = stronger)
-            const pullStrength = 0.3; // 30% movement
-            const moveX = (mouseX - centerX) * pullStrength;
-            const moveY = (mouseY - centerY) * pullStrength;
-
-            // Move the element TOWARDS the mouse
-            magnet.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            
-            // Expand Cursor to show "Lock On"
-            cursorOutline.style.width = '60px';
-            cursorOutline.style.height = '60px';
-            cursorOutline.style.borderColor = 'var(--secondary-color)';
-        } else {
-            // Reset position when mouse leaves field
-            magnet.classList.remove('magnet-active');
-            magnet.style.transform = `translate(0px, 0px)`;
-            
-            // Reset Cursor
-            cursorOutline.style.width = '40px';
-            cursorOutline.style.height = '40px';
-            cursorOutline.style.borderColor = 'var(--accent-color)';
-        }
-    });
-}
-
-console.log("SYSTEM: PROXIMITY SENSORS ONLINE.");
+console.log("SYSTEM: ATMOSPHERE ONLINE.");
