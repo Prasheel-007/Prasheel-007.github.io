@@ -1,0 +1,131 @@
+/* --- STATIC RESET --- */
+* { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+body { 
+    background-color: #050505; 
+    color: #e0e0e0; 
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* NAVIGATION */
+.civ-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 25px 5%; background: rgba(10, 10, 10, 0.95);
+    border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100;
+}
+.civ-logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
+
+.civ-menu { display: flex; gap: 40px; }
+.civ-menu a { 
+    color: #aaa; text-decoration: none; 
+    font-size: 1.1rem; 
+    font-weight: 500; transition: 0.2s; 
+}
+.civ-menu a:hover { color: #fff; }
+
+/* CTA BUTTON (The Portal to Cyber Mode) */
+.civ-cta {
+    background: #fff; color: #000; text-decoration: none;
+    padding: 12px 28px; font-weight: 700; font-size: 0.9rem; 
+    border-radius: 4px; transition: 0.3s; letter-spacing: 1px;
+}
+.civ-cta:hover { background: #ccc; transform: scale(1.05); }
+
+/* LAYOUT */
+.civ-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+/* HERO */
+.civ-hero {
+    height: 85vh; display: flex; flex-direction: column; 
+    justify-content: center; align-items: flex-start;
+    border-bottom: 1px solid #222;
+}
+.civ-hero h1 { font-size: 4.5rem; line-height: 1.1; margin-bottom: 20px; color: #fff; letter-spacing: -1px; }
+.civ-role { font-size: 2rem; color: #888; margin-bottom: 20px; font-weight: 300; }
+.civ-bio { font-size: 1.2rem; color: #666; max-width: 600px; margin-bottom: 50px; }
+
+.civ-btn-outline {
+    padding: 14px 35px; border: 1px solid #444; color: #fff; text-decoration: none; border-radius: 4px; transition: 0.3s;
+}
+.civ-btn-outline:hover { border-color: #fff; background: #fff; color: #000; }
+
+/* SECTIONS */
+.civ-section { padding: 120px 0; border-bottom: 1px solid #222; }
+.civ-heading { font-size: 2.5rem; margin-bottom: 60px; color: #fff; font-weight: 700; }
+
+/* GRID */
+.civ-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+.civ-card { background: #111; padding: 35px; border-radius: 8px; border: 1px solid #222; transition: 0.3s; }
+.civ-card:hover { border-color: #555; transform: translateY(-5px); }
+.civ-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: #fff; }
+.civ-tag { color: #555; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; display: block; }
+.civ-desc { color: #999; line-height: 1.6; }
+
+/* ABOUT */
+.civ-split { display: flex; gap: 80px; flex-wrap: wrap; }
+.civ-col { flex: 1; min-width: 300px; }
+.civ-item { border-left: 2px solid #333; padding-left: 25px; margin-bottom: 30px; }
+.civ-item h4 { color: #fff; font-size: 1.3rem; margin-bottom: 5px; }
+.civ-item span { color: #666; font-size: 0.95rem; display: block; margin-bottom: 5px; }
+.civ-item p { color: #999; }
+.civ-skills { display: flex; flex-wrap: wrap; gap: 12px; }
+.civ-skills span { background: #1a1a1a; padding: 10px 20px; border-radius: 30px; color: #ccc; font-size: 0.95rem; border: 1px solid #333; }
+
+/* FOOTER */
+.civ-footer { padding: 100px 0; text-align: center; }
+.civ-links { display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; }
+.civ-social-link { 
+    color: #fff; text-decoration: none; font-size: 1.2rem; 
+    border-bottom: 1px solid #333; padding-bottom: 5px; transition: 0.3s; 
+}
+.civ-social-link:hover { border-color: #fff; color: #fff; }
+.civ-link { color: #666; text-decoration: none; transition: 0.3s; }
+.civ-link:hover { color: #fff; }
+.civ-copyright { color: #444; font-size: 0.9rem; }
+/* =========================================
+   MOBILE OPTIMIZATION (CIVILIAN MODE)
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Stack the Navigation */
+    .civ-nav {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+    .civ-menu {
+        gap: 15px;
+        font-size: 0.9rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* 2. Adjust Hero Text */
+    .civ-hero h1 {
+        font-size: 2.5rem; /* Smaller text for phone */
+        text-align: center;
+    }
+    .civ-hero {
+        align-items: center; /* Center everything */
+        text-align: center;
+        height: auto;
+        padding: 80px 20px;
+    }
+    
+    /* 3. Stack the Grid */
+    .civ-grid {
+        grid-template-columns: 1fr; /* 1 column instead of 4 */
+    }
+
+    /* 4. Stack About Section */
+    .civ-split {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    /* 5. Center Footer */
+    .civ-links {
+        flex-direction: column;
+        gap: 20px;
+    }
+}

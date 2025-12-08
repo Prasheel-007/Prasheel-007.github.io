@@ -81,7 +81,7 @@ body {
     transition: width 0.2s, height 0.2s, background-color 0.2s; 
 }
 
-/* --- NAVIGATION (UPDATED) --- */
+/* --- NAVIGATION --- */
 nav {
     display: flex;
     justify-content: space-between;
@@ -98,8 +98,8 @@ nav {
 
 /* --- LOGO UPGRADE (Holographic Style) --- */
 .logo {
-    font-size: 2rem; /* Increased size */
-    font-weight: 800; /* Extra Bold */
+    font-size: 2rem; 
+    font-weight: 800; 
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -107,6 +107,7 @@ nav {
     /* Gradient Text Fill */
     background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
     -webkit-background-clip: text;
+    background-clip: text; /* FIXED: Standard property added */
     -webkit-text-fill-color: transparent;
     
     /* Neon Aura */
@@ -115,24 +116,24 @@ nav {
 }
 
 .logo:hover {
-    filter: drop-shadow(0 0 15px rgba(112, 0, 255, 0.8)); /* Glows Purple on hover */
+    filter: drop-shadow(0 0 15px rgba(112, 0, 255, 0.8)); 
 }
 
-/* --- NAV LINKS UPGRADE (Larger Size) --- */
+/* --- NAV LINKS --- */
 .nav-links { list-style: none; display: flex; gap: 30px; }
 
 .nav-links a { 
     color: var(--text-color); 
     text-decoration: none; 
     font-weight: 500; 
-    font-size: 1.1rem; /* Increased from 0.9rem */
+    font-size: 1.1rem; 
     display: inline-block; 
     transition: color 0.3s, text-shadow 0.3s; 
 }
 
 .nav-links a:hover { 
     color: var(--accent-color); 
-    text-shadow: 0 0 10px var(--accent-color); /* Added Glow */
+    text-shadow: 0 0 10px var(--accent-color); 
 }
 
 /* --- HERO SECTION --- */
@@ -288,3 +289,57 @@ footer { padding: 50px 5%; background: #000; text-align: center; border-top: 1px
 .contact-btn { color: var(--text-color); text-decoration: none; font-size: 1.2rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
 .contact-btn:hover { color: var(--accent-color); }
 .copyright { color: #484f58; font-size: 0.8rem; }
+
+/* =========================================
+   MOBILE OPTIMIZATION (CYBER MODE)
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* 1. DISABLE Custom Cursor on Mobile */
+    .cursor-dot, 
+    .cursor-outline {
+        display: none !important; 
+    }
+    body {
+        cursor: auto; 
+    }
+
+    /* 2. Resize Giant Text */
+    .hero h1 {
+        font-size: 2.2rem; 
+        line-height: 1.3;
+    }
+    .hero p {
+        font-size: 1rem;
+        padding: 0 20px;
+    }
+
+    /* 3. Stack Navigation */
+    nav {
+        flex-direction: column;
+        padding: 15px;
+        background: rgba(0,0,0,0.9); 
+    }
+    .nav-links {
+        margin-top: 15px;
+        gap: 20px;
+        font-size: 0.9rem;
+    }
+
+    /* 4. Stack Projects */
+    .project-grid {
+        grid-template-columns: 1fr; 
+        padding: 0 20px;
+    }
+
+    /* 5. Stack About Section */
+    .about-container {
+        flex-direction: column;
+    }
+    
+    /* 6. Footer Adjustments */
+    .contact-links {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
