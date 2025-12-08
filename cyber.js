@@ -1,125 +1,138 @@
-/* --- SYSTEM INITIALIZATION --- */
+/* --- UNIVERSAL CYBER CORE (CURSOR FIX + CINEMATIC) --- */
+
+// 1. Init Visual Cursor
 const cursorDot = document.createElement("div");
 const cursorOutline = document.createElement("div");
-
 cursorDot.className = "cursor-dot";
 cursorOutline.className = "cursor-outline";
-
 document.body.appendChild(cursorDot);
 document.body.appendChild(cursorOutline);
 
-// Select Targets
-const glitchTargets = document.querySelectorAll('.highlight');
-const gravityFields = document.querySelectorAll('.highlight, .cta-btn, .nav-links a, .project-card, h1');
+// 2. BOOT SEQUENCE
+window.addEventListener('load', () => {
+    const reactor = document.getElementById('reactor-container');
+    const cyberLayer = document.getElementById('cyber-layer');
 
-// Global Mouse Position
-let mouseX = 0;
-let mouseY = 0;
+    if (!reactor || !cyberLayer) return;
 
-// Outline coordinates (for the "drag" physics)
-let outlineX = 0;
-let outlineY = 0;
+    // Fix: Remove global perspective to prevent Cursor bug
+    document.body.style.overflowX = "hidden"; 
 
-/* --- PHYSICS LOOP --- */
+    setTimeout(() => {
+        reactor.classList.add('hidden');       
+        cyberLayer.classList.remove('hidden'); 
+    }, 2500);
+});
+
+// 3. INPUT TRACKING
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let outlineX = mouseX;
+let outlineY = mouseY;
+
+function handleInput(e) {
+    if (e.type === 'touchmove' || e.type === 'touchstart') {
+        if(e.touches.length > 0) {
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+        }
+    } else {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    }
+}
+
+window.addEventListener("mousemove", handleInput);
+window.addEventListener("touchmove", handleInput, { passive: true });
+window.addEventListener("touchstart", handleInput, { passive: true });
+
+// 4. PHYSICS LOOP
 function animate() {
-    // 1. Cursor Dot follows instantly
+    outlineX += (mouseX - outlineX) * 0.15;
+    outlineY += (mouseY - outlineY) * 0.15;
+
     cursorDot.style.left = `${mouseX}px`;
     cursorDot.style.top = `${mouseY}px`;
-
-    // 2. Cursor Outline follows with "Mass"
-    outlineX += (mouseX - outlineX) * 0.12;
-    outlineY += (mouseY - outlineY) * 0.12;
-
     cursorOutline.style.left = `${outlineX}px`;
     cursorOutline.style.top = `${outlineY}px`;
 
-    // 3. BACKGROUND LIGHT UPDATE
-    // This connects JS to CSS Variables. 
-    // It creates the "Heavy Light" effect on the background grid.
     document.documentElement.style.setProperty('--mouse-x', `${outlineX}px`);
     document.documentElement.style.setProperty('--mouse-y', `${outlineY}px`);
 
-    // 4. Run Physics Engines
-    handleGravity();
+    handleMagnet();
     checkProximity();
+    
+    updateScrollPhysics();
 
     requestAnimationFrame(animate);
 }
+animate(); 
 
-// Start the System
-animate();
+/* --- CINEMATIC SCROLL ENGINE (FIXED PERSPECTIVE) --- */
+function updateScrollPhysics() {
+    const parts = document.querySelectorAll('.mech-part');
+    const winH = window.innerHeight;
+    const assemblePoint = winH * 0.75; 
 
-/* --- INPUT LISTENER --- */
-window.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-});
+    parts.forEach(part => {
+        const rect = part.getBoundingClientRect();
+        let progress = (winH - rect.top) / assemblePoint;
+        progress = Math.min(Math.max(progress, 0), 1);
+        
+        part.style.opacity = progress;
+        const offset = 1 - progress; 
+        
+        // We add 'perspective(1000px)' individually so we don't break the fixed cursor
+        if (part.classList.contains('bottom-part')) {
+            part.style.transform = `perspective(1000px) translate3d(0, ${500 * offset}px, 0) rotateX(${45 * offset}deg) scale(${0.8 + (0.2 * progress)})`; 
+        } 
+        else if (part.classList.contains('left-part')) {
+            part.style.transform = `perspective(1000px) translate3d(${-500 * offset}px, 0, 0) rotateY(${-45 * offset}deg)`; 
+        } 
+        else if (part.classList.contains('right-part')) {
+            part.style.transform = `perspective(1000px) translate3d(${500 * offset}px, 0, 0) rotateY(${45 * offset}deg)`; 
+        } 
+        else if (part.classList.contains('top-part')) {
+             const navProgress = Math.min(Math.max((winH - rect.top) / 200, 0), 1);
+             const navOffset = 1 - navProgress;
+             part.style.transform = `translateY(${-100 * navOffset}px)`;
+        } 
+        else if (part.classList.contains('center-part')) {
+             part.style.transform = `scale(${0 + (1 * progress)})`;
+             part.style.opacity = progress;
+        }
+    });
+}
 
-/* --- GRAVITY ENGINE (Enhanced Range) --- */
-function handleGravity() {
-    let isInOrbit = false;
-
+/* --- OTHER PHYSICS --- */
+function handleMagnet() {
+    const gravityFields = document.querySelectorAll('.highlight, .cta-btn, .nav-links a, .project-card, h1, .contact-btn');
     gravityFields.forEach(field => {
         const rect = field.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-        
         const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
-        const orbitRadius = 600; // Wide Range
-        const coreRadius = 80;   // Event Horizon
-        
-        if (dist < orbitRadius) {
-            isInOrbit = true;
-            const rawPull = 1 - (dist / orbitRadius);
-            const gravityStrength = Math.pow(rawPull, 2); 
+        const range = 400; 
 
-            const moveX = (mouseX - centerX) * gravityStrength * 0.6; 
-            const moveY = (mouseY - centerY) * gravityStrength * 0.6;
-
+        if (dist < range) {
+            const pull = 1 - (dist / range);
+            const moveX = (mouseX - centerX) * pull * 0.5; 
+            const moveY = (mouseY - centerY) * pull * 0.5;
             field.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            
-            const size = 40 + (40 * gravityStrength); 
-            cursorOutline.style.width = `${size}px`;
-            cursorOutline.style.height = `${size}px`;
-            
-            if (dist < coreRadius) {
-                cursorOutline.style.borderColor = 'var(--secondary-color)'; 
-                cursorOutline.style.mixBlendMode = 'difference';
-                cursorOutline.style.opacity = 1;
-            } else {
-                cursorOutline.style.borderColor = 'var(--accent-color)'; 
-                cursorOutline.style.opacity = 0.5 + (gravityStrength * 0.5); 
-            }
         } else {
-            field.style.transform = `translate(0px, 0px)`;
+            field.style.transform = `translate(0, 0)`;
         }
     });
-
-    if (!isInOrbit) {
-        cursorOutline.style.width = '40px';
-        cursorOutline.style.height = '40px';
-        cursorOutline.style.borderColor = 'var(--accent-color)';
-        cursorOutline.style.opacity = 0.5;
-        cursorOutline.style.mixBlendMode = 'normal';
-    }
 }
 
-/* --- GLITCH TRIGGER --- */
 function checkProximity() {
+    const glitchTargets = document.querySelectorAll('.highlight');
     glitchTargets.forEach(target => {
         const rect = target.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
-
         target.classList.remove('glitch-active');
-        target.classList.remove('tremble');
-
-        if (dist < 80) {
-            target.classList.add('glitch-active'); 
-        } else if (dist < 300) {
-            target.classList.add('tremble'); 
-        }
+        if (dist < 150) target.classList.add('glitch-active');
     });
 }
-console.log("SYSTEM: ATMOSPHERE ONLINE.");
