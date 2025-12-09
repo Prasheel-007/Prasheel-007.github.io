@@ -9,7 +9,7 @@
     --mouse-y: 50%;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; } /* No smooth scroll for physics */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     background-color: var(--bg-color);
@@ -89,9 +89,12 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .cta-btn { padding: 14px 35px; background: transparent; border: 2px solid var(--accent-color); color: var(--accent-color); font-size: 1rem; font-weight: bold; cursor: pointer; text-decoration: none; border-radius: 5px; letter-spacing: 1px; display: inline-block; transition: box-shadow 0.3s, background 0.3s, color 0.3s; }
 .cta-btn:hover { background: var(--accent-color); color: var(--bg-color); box-shadow: 0 0 20px var(--accent-color); }
 
-.projects-section { padding: 100px 5%; background-color: transparent; }
+/* --- SECTION STYLING --- */
+section { padding: 100px 5%; background-color: transparent; position: relative; }
+
 .section-title { font-size: 2.5rem; text-align: center; margin-bottom: 60px; }
 .section-title span { border-bottom: 3px solid var(--secondary-color); }
+
 .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
 .project-card { background: rgba(22, 27, 34, 0.6); backdrop-filter: blur(10px); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); transition: box-shadow 0.3s, border-color 0.3s; }
 .project-card:hover { box-shadow: 0 10px 30px rgba(0, 243, 255, 0.2); border-color: var(--accent-color); }
@@ -100,7 +103,6 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .tech-stack { display: flex; flex-wrap: wrap; gap: 10px; }
 .tech-tag { background: rgba(112, 0, 255, 0.2); color: #b388ff; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
 
-.about-section { padding: 100px 5%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); }
 .about-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 50px; max-width: 1200px; margin: 0 auto; }
 .about-column { flex: 1; min-width: 300px; }
 .about-column h3 { font-size: 1.8rem; margin-bottom: 30px; color: var(--accent-color); border-left: 3px solid var(--secondary-color); padding-left: 15px; }
@@ -113,8 +115,20 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .skill-badge { background: rgba(255, 255, 255, 0.05); padding: 10px 20px; border-radius: 5px; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
 .skill-badge:hover { border-color: var(--accent-color); color: var(--accent-color); background: rgba(0, 243, 255, 0.1); }
 
-footer { padding: 50px 5%; background: #000; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); }
-.contact-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+footer { padding: 100px 5%; background: transparent; text-align: center; display: flex; justify-content: center; }
+.contact-card {
+    background: rgba(22, 27, 34, 0.6); 
+    backdrop-filter: blur(10px); 
+    border-radius: 20px; 
+    border: 1px solid rgba(255, 255, 255, 0.05); 
+    padding: 60px 40px;
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+.contact-card:hover { border-color: var(--accent-color); box-shadow: 0 0 40px rgba(0, 243, 255, 0.1); }
+.contact-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; margin-top: 30px; }
 .contact-btn { color: var(--text-color); text-decoration: none; font-size: 1.2rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
 .contact-btn:hover { color: var(--accent-color); }
 .resume-btn { display: inline-block; padding: 15px 40px; border: 1px solid var(--text-color); color: var(--text-color); text-decoration: none; font-family: monospace; letter-spacing: 2px; transition: 0.3s; background: rgba(0,0,0,0.5); }
@@ -123,12 +137,31 @@ footer { padding: 50px 5%; background: #000; text-align: center; border-top: 1px
 .back-btn:hover { color: #fff; border-color: #fff; }
 .copyright { color: #484f58; font-size: 0.8rem; }
 
-/* --- PHYSICS BASE STATE --- */
+/* --- PHYSICS BASE STATE (PHASE 1: Intro) --- */
 .mech-part {
-    /* NO TRANSITION: This ensures instant, 1:1 scroll scrubbing */
-    transition: none !important; 
-    opacity: 0; /* Start hidden, JS reveals based on scroll */
+    opacity: 0;
+    /* This allows the INTRO animation to happen smoothly */
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.5s ease-out;
     will-change: transform, opacity;
+}
+
+/* INITIAL POSITIONS (Where they fly FROM) */
+.mech-part.top-part { transform: translateY(-150px); }
+.mech-part.center-part { transform: scale(0.5); opacity: 0; }
+.mech-part.bottom-part { transform: translateY(150px); }
+.mech-part.left-part { transform: translateX(-150px); }
+.mech-part.right-part { transform: translateX(150px); }
+
+/* ASSEMBLED STATE (Where they snap TO) */
+.mech-part.active {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}
+
+/* --- PHYSICS SCROLL STATE (PHASE 2: Manual Control) --- */
+/* This class is added by JS after the intro finishes */
+body.physics-enabled .mech-part {
+    transition: none !important; /* Disables smoothing so scroll is instant */
 }
 
 @media (max-width: 768px) {
@@ -141,4 +174,5 @@ footer { padding: 50px 5%; background: #000; text-align: center; border-top: 1px
     .project-grid { grid-template-columns: 1fr; padding: 0 20px; }
     .about-container { flex-direction: column; }
     .contact-links { flex-direction: column; gap: 20px; }
+    .contact-card { padding: 40px 20px; }
 }

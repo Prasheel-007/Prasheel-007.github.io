@@ -1,4 +1,4 @@
-/* --- UNIVERSAL CYBER CORE (CURSOR FIX + CINEMATIC) --- */
+/* --- UNIVERSAL CYBER CORE (HYBRID PHYSICS) --- */
 
 // 1. Init Visual Cursor
 const cursorDot = document.createElement("div");
@@ -15,12 +15,27 @@ window.addEventListener('load', () => {
 
     if (!reactor || !cyberLayer) return;
 
-    // Fix: Remove global perspective to prevent Cursor bug
+    // Fix Cursor Bug
     document.body.style.overflowX = "hidden"; 
 
     setTimeout(() => {
         reactor.classList.add('hidden');       
         cyberLayer.classList.remove('hidden'); 
+
+        // PHASE 1: TRIGGER INTRO ANIMATIONS (CSS Transitions ON)
+        // Only trigger the Top and Center parts first
+        const introParts = document.querySelectorAll('.mech-part.top-part, .mech-part.center-part');
+        introParts.forEach((part, index) => {
+            setTimeout(() => part.classList.add('active'), 100 + (index * 200));
+        });
+
+        // PHASE 2: ENABLE MANUAL SCROLL PHYSICS (After 2 seconds)
+        setTimeout(() => {
+            document.body.classList.add('physics-enabled');
+            // Start the scroll loop ONLY after intro is done
+            scrollLoopActive = true; 
+        }, 2200);
+
     }, 2500);
 });
 
@@ -29,6 +44,7 @@ let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 let outlineX = mouseX;
 let outlineY = mouseY;
+let scrollLoopActive = false; // Flag to wait for intro
 
 function handleInput(e) {
     if (e.type === 'touchmove' || e.type === 'touchstart') {
@@ -46,8 +62,9 @@ window.addEventListener("mousemove", handleInput);
 window.addEventListener("touchmove", handleInput, { passive: true });
 window.addEventListener("touchstart", handleInput, { passive: true });
 
-// 4. PHYSICS LOOP
+// 4. MAIN LOOP
 function animate() {
+    // Cursor Physics
     outlineX += (mouseX - outlineX) * 0.15;
     outlineY += (mouseY - outlineY) * 0.15;
 
@@ -62,45 +79,45 @@ function animate() {
     handleMagnet();
     checkProximity();
     
-    updateScrollPhysics();
+    // Only run scroll physics if Intro is finished
+    if (scrollLoopActive) {
+        updateScrollPhysics();
+    }
 
     requestAnimationFrame(animate);
 }
 animate(); 
 
-/* --- CINEMATIC SCROLL ENGINE (FIXED PERSPECTIVE) --- */
+/* --- CINEMATIC SCROLL ENGINE --- */
 function updateScrollPhysics() {
     const parts = document.querySelectorAll('.mech-part');
     const winH = window.innerHeight;
-    const assemblePoint = winH * 0.75; 
+    const assemblePoint = winH * 0.85; // Trigger earlier (85% of screen)
 
     parts.forEach(part => {
+        // Skip the Intro parts (Nav & Hero) so they don't get messed up by scroll
+        if (part.classList.contains('top-part') || part.classList.contains('center-part')) return;
+
         const rect = part.getBoundingClientRect();
+        
+        // Calculate Progress
         let progress = (winH - rect.top) / assemblePoint;
         progress = Math.min(Math.max(progress, 0), 1);
         
+        // Apply Physics
         part.style.opacity = progress;
         const offset = 1 - progress; 
         
-        // We add 'perspective(1000px)' individually so we don't break the fixed cursor
+        // 3D Transforms
         if (part.classList.contains('bottom-part')) {
-            part.style.transform = `perspective(1000px) translate3d(0, ${500 * offset}px, 0) rotateX(${45 * offset}deg) scale(${0.8 + (0.2 * progress)})`; 
+            part.style.transform = `perspective(1000px) translate3d(0, ${300 * offset}px, 0) rotateX(${30 * offset}deg)`; 
         } 
         else if (part.classList.contains('left-part')) {
-            part.style.transform = `perspective(1000px) translate3d(${-500 * offset}px, 0, 0) rotateY(${-45 * offset}deg)`; 
+            part.style.transform = `perspective(1000px) translate3d(${-300 * offset}px, 0, 0) rotateY(${-30 * offset}deg)`; 
         } 
         else if (part.classList.contains('right-part')) {
-            part.style.transform = `perspective(1000px) translate3d(${500 * offset}px, 0, 0) rotateY(${45 * offset}deg)`; 
+            part.style.transform = `perspective(1000px) translate3d(${300 * offset}px, 0, 0) rotateY(${30 * offset}deg)`; 
         } 
-        else if (part.classList.contains('top-part')) {
-             const navProgress = Math.min(Math.max((winH - rect.top) / 200, 0), 1);
-             const navOffset = 1 - navProgress;
-             part.style.transform = `translateY(${-100 * navOffset}px)`;
-        } 
-        else if (part.classList.contains('center-part')) {
-             part.style.transform = `scale(${0 + (1 * progress)})`;
-             part.style.opacity = progress;
-        }
     });
 }
 
